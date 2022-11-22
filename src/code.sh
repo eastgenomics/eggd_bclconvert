@@ -1,5 +1,6 @@
 #!/bin/bash
-set -e -x -o pipefail
+set -exo pipefail
+
 
 _download_files () {
   : '''
@@ -53,41 +54,38 @@ _download_files () {
     echo "Downloading and unpacking took $(($duration / 60))m$(($duration % 60))s."
 
   else
-    dx-jobutil-report-error "Please provide either a compressed run folder or an upload Sentinel Record as an input"
+    dx-jobutil-report-error "No sentinel record or run data provided as input"
   fi
 }
 
 
-_upload_files () {
+_upload_all_output(){
   : '''
-  Compress InterOp and Logs directories for single file uploads, then
-  upload all data except the bcl files
+  Upload all data in /home/dnanexus/out/output
   '''
-  outdir=/home/dnanexus/out/output && mkdir -p ${outdir}
-
-  # tar the Logs/ and InterOp/ directories to speed up upload process
-  tar -czf InterOp.tar.gz InterOp/
-  tar -czf Logs.tar.gz Logs/
-
-  # move dirs to output to be uploaded
-  mv -t ${outdir}/ Output/ Config/ Recipe/
-
-  # add tars and other required files to upload separately
-  mv -t ${outdir}/ InterOp.tar.gz Logs.tar.gz
-  mv R*.* ${outdir}/ # RTAComplete.{txt/xml}. RTA3.cfg, RunInfo.xml, RunParameters.xml
-  mv S*.* ${outdir}/ # SampleSheet.csv and SequenceComplete.txt
-
-  # Upload outputs
   echo "Total files to upload: $(find /home/dnanexus/out/output -type f | wc -l)"
   SECONDS=0
 
-  # upload all output files and add to output spec
-  find /home/dnanexus/out/output -type f \
-    | xargs -P ${THREADS} -n1 -I{} dx upload {} --brief \
-    | xargs -I{} dx-jobutil-add-output output_files {} --class=array:file
+  # upload all output files in parallel and add to output spec
+  export -f _upload_single_file 
+  find "$OUTDIR" -type f  | xargs -P ${THREADS} -n1 -I{} bash -c "_upload_single_file {}"
 
   duration=$SECONDS
   echo "Uploading took $(($duration / 60))m$(($duration % 60))s."
+}
+
+
+_upload_single_file(){
+  : '''
+  Uploads single file with dx upload and associates uploaded file ID to output spec
+  '''
+  local file=$1
+  local remote_path=$(sed s'/\/home\/dnanexus\/out\/output//' <<< "$file")
+
+  echo "file: ${file}"
+
+  file_id=$(dx upload -p "$file" --path "$remote_path" --brief)
+  dx-jobutil-add-output output_files "$file_id" --array
 }
 
 
@@ -106,7 +104,7 @@ _find_samplesheet () {
     # e.g. run-id_SampleSheet.csv, sample_sheet.csv, Sample Sheet.csv, sampleSheet.csv etc.
     samplesheet=$(find ./ -regextype posix-extended  -iregex '.*sample[-_ ]?sheet.csv$')
     echo "Using sample sheet in run directory: $samplesheet"
-    mv ${samplesheet} /home/dnanexus/SampleSheet.csv
+    mv "$samplesheet" /home/dnanexus/SampleSheet.csv
 
   elif [ -n "${upload_sentinel_record}" ]; then
     # Samplesheet not present in run data, check if linked to sentinel record
@@ -124,6 +122,7 @@ _find_samplesheet () {
 
 main() {
   THREADS=$(nproc --all)  # control how many operations to open in parallel
+  OUTDIR=/home/dnanexus/out/output && mkdir -p ${OUTDIR}
 
   mark-section "Downloading input files"
   _download_files
@@ -142,18 +141,31 @@ main() {
   duration=$SECONDS
   echo "Running bcl-convert took $(($duration / 60))m$(($duration % 60))s."
 
+  mark-section "Formatting output for uploading"
+  # tar InterOp and Logs directories for single file uploads
+  tar -czf InterOp.tar.gz InterOp/
+  tar -czf Logs.tar.gz Logs/
+
+  # move all files and dirs to output/ to be uploaded
+  mv -t ${OUTDIR}/ Output/ Config/ Recipe/
+  mv -t ${OUTDIR}/ InterOp.tar.gz Logs.tar.gz
+  mv R*.* ${OUTDIR}/ # RTAComplete.{txt/xml}. RTA3.cfg, RunInfo.xml, RunParameters.xml
+  mv S*.* ${OUTDIR}/ # SampleSheet.csv and SequenceComplete.txt
+
   mark-section "Uploading output"
-  _upload_files
+  _upload_all_output
 
   # check usage to monitor usage of instance storage
   echo "Total file system usage"
   df -h
 
   # tag job with usage to easily see what is being used
+  mark-section "Tagging job"
   usage=$(df -h | grep "/dev/mapper/md0-crypt" | tr -s ' ')
   used=$(cut -d' ' -f3 <<< "$usage")
   total=$(cut -d' ' -f2 <<< "$usage")
   pct=$(cut -d' ' -f5 <<< "$usage")
   dx tag $DX_JOB_ID "Instance storage used: ${pct} (${used}/${total})"
+
   mark-success
 }
