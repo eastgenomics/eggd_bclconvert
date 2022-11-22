@@ -23,6 +23,7 @@ Optional input parameters:
 * uploads all data from the sequencer (except for bcl files)
 * all files in `Logs/` are uploaded to a single tar (`Logs.tar.gz`)
 * all files in `InterOp/` are uploaded to a single tar (`InterOp.tar.gz`)
+* uploads all output files from bcl-convert (written to `Output/`)
 
 ## Dependencies
 The app depends on the bcl-convert asset built to DNAnexus.
