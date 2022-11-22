@@ -2,14 +2,13 @@
   "name": "eggd_bclconvert",
   "title": "eggd_bclconvert",
   "version": "1.0.0",
-  "summary": "Converts Illumina data from BCL to FASTQ using bgclconvert",
-  "tags": ["Read Mapping"],
+  "summary": "Converts Illumina data from BCL to FASTQ using bclconvert",
   "dxapi": "1.0.0",
   "inputSpec": [
     {
       "name": "upload_sentinel_record",
       "label": "Incremental upload sentinel record",
-      "help": "The sentinel record produced by the the incremental_upload.sh script. When this record is closed it indicates that the upload is complete and bcl2fastq can begin.",
+      "help": "The sentinel record produced by dx-streaming-upload",
       "class": "record",
       "optional": true
     },
