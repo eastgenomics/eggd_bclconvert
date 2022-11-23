@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "summary": "Converts Illumina data from BCL to FASTQ using bclconvert",
   "dxapi": "1.0.0",
+  "properties": {
+    "githubRelease": "v1.0.0"
+  },
   "inputSpec": [
     {
       "name": "upload_sentinel_record",
