@@ -133,7 +133,8 @@ main() {
   mark-section "Running bcl-convert"
   SECONDS=0
 
-  /usr/bin/time -v /usr/bin/bcl-convert \
+  # run bclconvert, writing compute usage to file
+  /usr/bin/time -v -o bclconvert.time /usr/bin/bcl-convert \
     --bcl-input-directory /home/dnanexus \
     --output-directory /home/dnanexus/Output \
     -f $advanced_opts
@@ -161,11 +162,21 @@ main() {
 
   # tag job with usage to easily see what is being used
   mark-section "Tagging job"
+
+  # storage usage
   usage=$(df -h | grep "/dev/mapper/md0-crypt" | tr -s ' ')
   used=$(cut -d' ' -f3 <<< "$usage")
   total=$(cut -d' ' -f2 <<< "$usage")
   pct=$(cut -d' ' -f5 <<< "$usage")
   dx tag $DX_JOB_ID "Instance storage used: ${pct} (${used}/${total})"
+
+  # memory usage
+  max_used_mem_kb=$(grep "Maximum resident set size" bclconvert.time | cut -d':' -f2)
+  max_used_mem_gb=$(bc <<< "scale=2; $max_used_mem_kb / 1024 / 1024")
+  sys_memory_kb=$(grep MemTotal /proc/meminfo | cut -d':' -f2 | sed s'/kB//')
+  sys_memory_gb=$(bc <<< "scale=2;$sys_memory_kb / 1024 / 1024")
+  pct_usage=$(bc <<< "scale=4; $max_used_mem_kb / $sys_memory_kb * 100" | head -c -3)
+  dx tag $DX_JOB_ID "Peak memory usage by bclconvert ${pct_usage}% (${max_used_mem_gb}G/${sys_memory_gb}G)"
 
   mark-success
 }
