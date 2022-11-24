@@ -1,0 +1,94 @@
+{
+  "name": "eggd_bclconvert",
+  "title": "eggd_bclconvert",
+  "version": "1.0.0",
+  "summary": "Converts Illumina data from BCL to FASTQ using bclconvert",
+  "dxapi": "1.0.0",
+  "properties": {
+    "githubRelease": "v1.0.0"
+  },
+  "inputSpec": [
+    {
+      "name": "upload_sentinel_record",
+      "label": "Incremental upload sentinel record",
+      "help": "The sentinel record produced by dx-streaming-upload",
+      "class": "record",
+      "optional": true
+    },
+    {
+      "name": "run_archive",
+      "label": "Archive of top level run folder",
+      "help": "One archived file containing the top level output from the run. This archive should contain RunInfo.xml and be named the same as the original file.",
+      "class": "array:file",
+      "patterns": ["*.rar", "*.zip", "*.tar.gz", "*.tgz"],
+      "optional": true
+    },
+    {
+      "name": "sample_sheet",
+      "label": "Sample sheet",
+      "help": "The sample sheet file in CSV format. If specified, will override any samplesheets present in the run data.",
+      "class": "file",
+      "patterns": ["*.csv"],
+      "optional": true
+    },
+    {
+      "name": "advanced_opts",
+      "label": "Advanced options",
+      "help": "Additional command-line options to be passed verbatim to the invocation of bclconvert.",
+      "class": "string",
+      "optional": true,
+      "default": "--strict-mode true",
+      "group": "Advanced"
+    }
+  ],
+  "outputSpec": [
+    {
+      "name": "output_files",
+      "label": "All files (except bcls) from the sequencer after demultiplexing",
+      "help": "An array of files with run statistics",
+      "class": "array:file"
+    }
+  ],
+  "runSpec": {
+    "file": "src/code.sh",
+    "release": "20.04",
+    "version": "0",
+    "interpreter": "bash",
+    "distribution": "Ubuntu",
+    "assetDepends": [
+      {
+        "name": "bclconvert_v4.0.3",
+        "version": "1.0.0",
+        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
+        "folder": "/app_assets/bclconvert/"
+      }
+    ]
+  },
+  "access": {
+    "project": "UPLOAD",
+    "allProjects":"UPLOAD"
+  },
+  "developers":[
+    "org-emee_1"
+  ],
+  "authorizedUsers": [
+    "org-emee_1"
+  ],
+  "details": {
+    "upstreamAuthor": "Illumina",
+    "upstreamVersion": "v4.0.3",
+    "upstreamLicenses": ["-"],
+    "citations": ["-"],
+    "upstreamUrl": "https://support.illumina.com/content/dam/illumina-support/documents/documentation/software_documentation/bcl2fastq/bcl2fastq2_guide_15051736_v2.pdf"
+  },
+  "ignoreReuse": false,
+  "regionalOptions": {
+    "aws:eu-central-1": {
+      "systemRequirements": {
+        "*": {
+          "instanceType": "mem2_ssd1_v2_x32"
+        }
+      }
+    }
+  }
+}
