@@ -13,7 +13,7 @@ For large flowcells it may be necessary to use a larger instance with more stora
 
 ## What data are required for this app to run?
 This app requires
-* SampleSheet.csv (included in the run data, associated to the sentinel file or provided with `-isample_sheet`)
+* SampleSheet.csv (included in the run data, associated to the sentinel file or provided with `-isample_sheet`. If specified with `-isample_sheet`, will override any samplesheets present in the run data.)
 * upload sentinel record OR array of tar.gz containing the output packets from the sequencer
 
 Optional input parameters:
