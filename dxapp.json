@@ -26,7 +26,7 @@
     {
       "name": "sample_sheet",
       "label": "Sample sheet",
-      "help": "The sample sheet file in CSV format.",
+      "help": "The sample sheet file in CSV format. If specified, will override any samplesheets present in the run data.",
       "class": "file",
       "patterns": ["*.csv"],
       "optional": true
