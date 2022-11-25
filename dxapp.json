@@ -55,6 +55,11 @@
     "version": "0",
     "interpreter": "bash",
     "distribution": "Ubuntu",
+    "timeoutPolicy": {
+      "*": {
+        "hours": 8
+      }
+    },
     "assetDepends": [
       {
         "name": "bclconvert_v4.0.3",
