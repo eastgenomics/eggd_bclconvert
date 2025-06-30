@@ -1,7 +1,7 @@
 {
   "name": "eggd_bclconvert",
   "title": "eggd_bclconvert",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "summary": "Converts Illumina data from BCL to FASTQ using bclconvert",
   "dxapi": "1.0.0",
   "properties": {
@@ -51,13 +51,13 @@
   ],
   "runSpec": {
     "file": "src/code.sh",
-    "release": "20.04",
+    "release": "24.04",
     "version": "0",
     "interpreter": "bash",
     "distribution": "Ubuntu",
     "timeoutPolicy": {
       "*": {
-        "hours": 8
+        "hours": 18
       }
     },
     "assetDepends": [

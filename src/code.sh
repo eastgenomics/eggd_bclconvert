@@ -1,6 +1,13 @@
 #!/bin/bash
 set -exo pipefail
 
+# prefixes all lines of commands written to stdout with datetime
+PS4='\000[$(date)]\011'
+export TZ=Europe/London
+
+# set frequency of instance usage in logs to 10 seconds
+kill $(ps aux | grep pcp-dstat | head -n1 | awk '{print $2}')
+/usr/bin/dx-dstat 10
 
 _download_files () {
   : '''
@@ -143,6 +150,16 @@ main() {
   echo "Running bcl-convert took $(($duration / 60))m$(($duration % 60))s."
 
   mark-section "Formatting output for uploading"
+
+  # untar InterOp tarball be be able to run interop commands
+  echo "Generating InterOp summary CSV files"
+  mkdir -p interop_pkg
+  tar -xvjf ~/illumina-interop-1.5.0-h503566f_0.tar.bz2 -C interop_pkg
+  export PATH="$PWD/interop_pkg/bin:$PATH"
+  # Run InterOp commands
+  interop_summary --csv=1 ~/ > ${outdir}/interop_summary.csv || echo "interop_summary failed"
+  interop_index-summary --csv=1 ~/ > ${outdir}/interop_index_summary.csv || echo "interop_index-summary failed"
+
   # tar InterOp and Logs directories for single file uploads
   tar -czf InterOp.tar.gz InterOp/
   tar -czf Logs.tar.gz Logs/
