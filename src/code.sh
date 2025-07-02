@@ -157,8 +157,8 @@ main() {
   tar -xvjf ~/illumina-interop-1.5.0-h503566f_0.tar.bz2 -C interop_pkg
   export PATH="$PWD/interop_pkg/bin:$PATH"
   # Run InterOp commands
-  interop_summary --csv=1 ~/ > ${outdir}/interop_summary.csv || echo "interop_summary failed"
-  interop_index-summary --csv=1 ~/ > ${outdir}/interop_index_summary.csv || echo "interop_index-summary failed"
+  interop_summary --csv=1 ~/ > ${OUTDIR}/interop_summary.csv || echo "interop_summary failed"
+  interop_index-summary --csv=1 ~/ > ${OUTDIR}/interop_index_summary.csv || echo "interop_index-summary failed"
 
   # tar InterOp and Logs directories for single file uploads
   tar -czf InterOp.tar.gz InterOp/
