@@ -148,7 +148,7 @@ main() {
 
   duration=$SECONDS
   echo "Running bcl-convert took $(($duration / 60))m$(($duration % 60))s."
-
+  cp Output/Reports/IndexMetricsOut.bin InterOp/
   mark-section "Formatting output for uploading"
 
   # untar InterOp tarball be be able to run interop commands
@@ -157,8 +157,8 @@ main() {
   tar -xvjf ~/illumina-interop-1.5.0-h503566f_0.tar.bz2 -C interop_pkg
   export PATH="$PWD/interop_pkg/bin:$PATH"
   # Run InterOp commands
-  interop_summary --csv=1 ~/ > ${OUTDIR}/interop_summary.csv || echo "interop_summary failed"
-  interop_index-summary --csv=1 ~/ > ${OUTDIR}/interop_index_summary.csv || echo "interop_index-summary failed"
+  interop_summary --csv=1 ~/ > ${OUTDIR}/interop_summary.csv
+  interop_index-summary --csv=1 ~/ > ${OUTDIR}/interop_index_summary.csv
 
   # tar InterOp and Logs directories for single file uploads
   tar -czf InterOp.tar.gz InterOp/
@@ -170,6 +170,8 @@ main() {
   mv R*.* ${OUTDIR}/ # RTAComplete.{txt/xml}. RTA3.cfg, RunInfo.xml, RunParameters.xml
   mv S*.* ${OUTDIR}/ # SampleSheet.csv and SequenceComplete.txt
 
+  #create a json file
+  echo "{}" > job_output.json
   mark-section "Uploading output"
   _upload_all_output
 
