@@ -148,7 +148,7 @@ main() {
 
   duration=$SECONDS
   echo "Running bcl-convert took $(($duration / 60))m$(($duration % 60))s."
-  cp Reports/IndexMetricsOut.bin InterOp/
+  cp Output/Reports/IndexMetricsOut.bin InterOp/
   mark-section "Formatting output for uploading"
 
   # untar InterOp tarball be be able to run interop commands
@@ -170,6 +170,8 @@ main() {
   mv R*.* ${OUTDIR}/ # RTAComplete.{txt/xml}. RTA3.cfg, RunInfo.xml, RunParameters.xml
   mv S*.* ${OUTDIR}/ # SampleSheet.csv and SequenceComplete.txt
 
+  #create a json file
+  echo "{}" > job_output.json
   mark-section "Uploading output"
   _upload_all_output
 
