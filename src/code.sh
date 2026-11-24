@@ -141,6 +141,8 @@ main() {
   SECONDS=0
 
   # run bclconvert, writing compute usage to file
+  /usr/bin/bcl-convert --version
+  
   /usr/bin/time -v -o bclconvert.time /usr/bin/bcl-convert \
     --bcl-input-directory /home/dnanexus \
     --output-directory /home/dnanexus/Output \

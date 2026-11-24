@@ -1,11 +1,14 @@
 {
   "name": "eggd_bclconvert",
   "title": "eggd_bclconvert",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "summary": "Converts Illumina data from BCL to FASTQ using bclconvert",
   "dxapi": "1.0.0",
+  "whatsNew": {
+      "v1.2.0": "Change DNA Nexus app-asset fileID to use BCLConvert v4.6.2"
+  },
   "properties": {
-    "githubRelease": "v1.0.0"
+    "githubRelease": "v1.2.0"
   },
   "inputSpec": [
     {
@@ -62,10 +65,9 @@
     },
     "assetDepends": [
       {
-        "name": "bclconvert_v4.0.3",
-        "version": "1.0.0",
-        "project": "project-Fkb6Gkj433GVVvj73J7x8KbV",
-        "folder": "/app_assets/bclconvert/"
+        "name": "bclconvert_asset",
+        "version": "2.0.0",
+        "id": "record-JFzP99j4gpFkqB1xxXJ9Zxvy"
       }
     ]
   },
